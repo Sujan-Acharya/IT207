@@ -1,0 +1,3 @@
+Event emitters fire events and include the ability to handle those events when triggered.
+Some important Node API components, such as HTTP servers, TCP servers, and streams,
+are implemented as event emitters. You can also create your own.
