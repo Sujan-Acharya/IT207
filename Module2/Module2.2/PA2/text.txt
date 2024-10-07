@@ -1,0 +1,12 @@
+Callbacks generally define logic for one-off responses. If
+you perform a database query, for example, you can specify a
+callback to determine what to do with the query results. The
+callback may display the database results, do a calculation
+based on the results, or execute another callback using the
+query results as an argument. Event listeners, on the other
+hand, are essentially callbacks that are associated with a
+conceptual entity (an event). For comparison, a mouse click
+is an event you would handle in the browser when someone
+clicks the mouse. As an example, in Node an HTTP server emits
+a request event when an HTTP request is made. You can listen
+for that request event to occur and add some response logic.
