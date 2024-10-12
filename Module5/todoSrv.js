@@ -60,11 +60,13 @@ function processDELETE(req, res) {
   //Assuming we are geting valid index
   index = url.replace("/", "");
   console.log(index);
-  if (Number.isNaN(index)) {
-    console.log("Index sent is Invalid");
-    res.end();
+  if (index === "") {
+    res.end("Missing index from item to be deleted");
+  } else if (Number.isNaN(parseInt(index))) {
+    console.log("Index sent is invalid");
+    res.end("Index is not invalid");
   } else {
-    items.splice(parseInt(url.replace("/", "")), 1);
-    res.end();
+    items.splice(parseInt(index), 1);
+    res.end(`Item at index ${index} deleted`);
   }
 }
