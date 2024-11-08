@@ -167,6 +167,10 @@ const putHandler = (file, newItem, index, cb) => {
   loadInitializeList(file, index, (list, index) => {
     console.log(" List Size = " + list.length);
     console.log(" Item index = " + index);
+    if (index < 1 || index > list.length) {
+      cb(400, "BAD REQUEST\n");
+      return;
+    }
     let item = list[index - 1];
     let keys = Object.keys(newItem);
     for (let index = 0; index < keys.length; index++) {
@@ -184,6 +188,11 @@ const deleteHandler = (file, newItem, index, cb) => {
   loadInitializeList(file, index, (list, index) => {
     console.log(" List Size = " + list);
     console.log(" Item index = ", index);
+
+    if (index < 1 || index > list.length) {
+      cb(400, "BAD REQUEST\n");
+      return;
+    }
     let mod_list = list.splice(index - 1, 1);
 
     storeList(file, list);
