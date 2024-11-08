@@ -77,12 +77,14 @@ requestHandler = (req, res) => {
           res.setHeader("content-type", 'text/plain; charset="utf-8"');
           res.writeHeader(statuscode);
           res.end(response);
+          res.statuscode = 200;
         });
       } else if (path == "todo") {
         deleteHandler(todo_file, query, index, (statuscode, response) => {
           res.setHeader("content-type", 'text/plain; charset="utf-8"');
           res.writeHeader(statuscode);
           res.end(response);
+          res.statuscode = 200;
         });
       } else {
         res.statuscode = 404;
@@ -96,10 +98,15 @@ requestHandler = (req, res) => {
           res.setHeader("content-type", 'text/plain; charset="utf-8"');
           res.writeHeader(statuscode);
           res.end(response);
+          res.statuscode = 200;
         });
       } else if (path == "todo") {
-        res.setHeader("Content-Type", "text/plain; charset=utf-8");
-        res.end(`In ${method} in the ${path} path`);
+        putHandler(todo_file, query, index, (statuscode, response) => {
+          res.setHeader("content-type", 'text/plain; charset="utf-8"');
+          res.writeHeader(statuscode);
+          res.end(response);
+          res.statuscode = 200;
+        });
       } else {
         res.statuscode = 404;
         res.end(`In ${method} in an invalid path`);
@@ -167,6 +174,7 @@ const putHandler = (file, newItem, index, cb) => {
   loadInitializeList(file, index, (list, index) => {
     console.log(" List Size = " + list.length);
     console.log(" Item index = " + index);
+
     if (index < 1 || index > list.length) {
       cb(400, "BAD REQUEST\n");
       return;
