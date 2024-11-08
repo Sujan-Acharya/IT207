@@ -43,14 +43,17 @@ requestHandler = (req, res) => {
           res.setHeader("content-type", 'text/plain; charset="utf-8"');
           res.writeHeader(statuscode);
           res.end(response);
+          res.statuscode = 200;
         });
       } else if (path == "todo") {
         postHandler(todo_file, query, (statuscode, response) => {
           res.setHeader("content-type", 'text/plain; charset="utf-8"');
           res.writeHeader(statuscode);
           res.end(response);
+          res.statuscode = 200;
         });
       } else {
+        res.statuscode = 404;
         res.end(`In ${method} in an invalid path`);
       }
       break;
@@ -58,9 +61,12 @@ requestHandler = (req, res) => {
     case "GET":
       if (path == "shop") {
         getHandler(shop_file, index, res);
+        res.statuscode = 200;
       } else if (path == "todo") {
         getHandler(todo_file, index, res);
+        res.statuscode = 200;
       } else {
+        res.statuscode = 404;
         res.end(`In ${method} in an invalid path`);
       }
       break;
@@ -78,8 +84,8 @@ requestHandler = (req, res) => {
           res.writeHeader(statuscode);
           res.end(response);
         });
-        res.end(`In ${method} in the ${path} path`);
       } else {
+        res.statuscode = 404;
         res.end(`In ${method} in an invalid path`);
       }
       break;
@@ -92,13 +98,10 @@ requestHandler = (req, res) => {
           res.end(response);
         });
       } else if (path == "todo") {
-        putHandler(todo_file, query, index, (statuscode, response) => {
-          res.setHeader("content-type", 'text/plain; charset="utf-8"');
-          res.writeHeader(statuscode);
-          res.end(response);
-        });
+        res.setHeader("Content-Type", "text/plain; charset=utf-8");
         res.end(`In ${method} in the ${path} path`);
       } else {
+        res.statuscode = 404;
         res.end(`In ${method} in an invalid path`);
       }
       break;
@@ -150,7 +153,7 @@ const getHandler = (file, index, res) => {
   let rstream = fs.createReadStream(file);
   rstream.pipe(res);
   rstream.on("error", function (err) {
-    if (err.code === ENOENT) {
+    if (err.code === "ENOENT") {
       res.statuscode = 404;
       res.end("NOT FOUND");
     } else {
@@ -162,8 +165,8 @@ const getHandler = (file, index, res) => {
 
 const putHandler = (file, newItem, index, cb) => {
   loadInitializeList(file, index, (list, index) => {
-    console.log(" List Size = " + list);
-    console.log(" Item index = ", index);
+    console.log(" List Size = " + list.length);
+    console.log(" Item index = " + index);
     let item = list[index - 1];
     let keys = Object.keys(newItem);
     for (let index = 0; index < keys.length; index++) {
