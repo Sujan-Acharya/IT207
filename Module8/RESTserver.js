@@ -73,11 +73,6 @@ requestHandler = (req, res) => {
           res.end(response);
         });
       } else if (path == "todo") {
-        deleteHandler(todo_file, query, index, (statuscode, response) => {
-          res.setHeader("content-type", 'text/plain; charset="utf-8"');
-          res.writeHeader(statuscode);
-          res.end(response);
-        });
         res.end(`In ${method} in the ${path} path`);
       } else {
         res.end(`In ${method} in an invalid path`);
@@ -92,11 +87,6 @@ requestHandler = (req, res) => {
           res.end(response);
         });
       } else if (path == "todo") {
-        putHandler(todo_file, query, index, (statuscode, response) => {
-          res.setHeader("content-type", 'text/plain; charset="utf-8"');
-          res.writeHeader(statuscode);
-          res.end(response);
-        });
         res.end(`In ${method} in the ${path} path`);
       } else {
         res.end(`In ${method} in an invalid path`);
@@ -183,7 +173,7 @@ const deleteHandler = (file, newItem, index, cb) => {
     console.log(" Item index = ", index);
     let mod_list = list.splice(index - 1, 1);
 
-    storeList(file, list);
+    storeList(shop_file, list);
     cb(200, "OK\n");
   });
 };
