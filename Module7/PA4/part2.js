@@ -111,16 +111,16 @@ function processDELETE(req, res, searchParams) {
   const { index } = Object.fromEntries(searchParams);
   const parsedIndex = parseInt(index, 10) - 1;
 
-  if (
-    Number.isNaN(parsedIndex) ||
-    parsedIndex < 0 ||
-    parsedIndex >= items.length
-  ) {
-    res.end("Out of bound index");
-    return;
-  }
+  if (index === "") {
+    res.end("Missing index from item to be deleted");
+  } else if (Number.isNaN(parsedIndex)) {
+    console.log("Index sent is invalid");
+    res.end("Index is not invalid");
+  } else if (parsedIndex < 0 || parsedIndex >= items.length)
+    res.end("Index out of bounds");
+  else {
+    items.splice(parsedIndex, 1);
 
-  items.splice(parsedIndex, 1);
-  res.end(`Item at index ${parsedIndex + 1} deleted`);
-  console.log(items);
+    res.end(`Item at index ${parsedIndex + 1} deleted`);
+  }
 }
