@@ -68,26 +68,26 @@ exports.update = function (conn, table, obj, cb) {
   });
 };
 
-exports.delete = function (db, table, obj, cb) {
-  let student_del = "delete from StudTrack.Students WHERE S_CODE = ?";
-  let course_del = "delete from StudTrack.Course WHERE C_CODE = ?";
-  let student_course_del =
-    "delete from StudTrack.StudentCourse WHERE S_CODE = ? AND C_CODE = ?";
+exports.delete = function (conn, table, obj, cb) {
+  let student_sql = "DELETE FROM StudTrack.Students WHERE S_CODE = ?";
+  let course_sql = "DELETE FROM StudTrack.Course WHERE C_CODE = ?";
+  let studcourse_sql =
+    "DELETE FROM StudTrack.StudentCourse WHERE S_CODE = ? AND C_CODE = ?";
   let sql = "";
   let values = [];
 
-  if (table == "Students") {
-    sql = student_del;
+  if (table === "Students") {
+    sql = student_sql;
     values = [obj.S_CODE];
-  } else if (table == "Course") {
-    sql = course_del;
+  } else if (table === "Course") {
+    sql = course_sql;
     values = [obj.C_CODE];
   } else {
-    sql = student_course_del;
+    sql = studcourse_sql;
     values = [obj.S_CODE, obj.C_CODE];
   }
 
-  db.query(sql, values, (err, results) => {
+  conn.query(sql, values, (err, results) => {
     if (err) throw err;
     cb(results);
   });

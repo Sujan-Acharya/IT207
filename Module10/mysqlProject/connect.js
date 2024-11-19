@@ -72,11 +72,13 @@ switch (op.toUpperCase()) {
     break;
   case "DELETE":
     let buffer_del = fs.readFileSync("./s_obj.json");
-    let obj_del = JSON.parse(buffer);
-    console.log("Obj = ", obj);
-    operations.delete(mysqlConnect, table, obj_del, (results));
-        console.log(results); });
+    let obj_del = JSON.parse(buffer_del);
+    console.log("Obj = ", obj_del);
+    operations.delete(mysqlConnect, table, obj_del, (results) => {
+      console.log(results);
+    });
     break;
+    
   case "DISPLAY":
     operations.display(mysqlConnect, table, (results) => {
       console.log("The results are\n");
