@@ -32,7 +32,7 @@ fs.access(welcome_file, fs.constants.F_OK, (err) => {
       "Welcome To Chilly Delights\n\nMake unforgettable memories with our super chilly ice cream specialities.\nBring family and friends and enjoy some freezing moments",
       (err) => {
         if (err) throw err;
-        console.log("Welcome to out server");
+        console.log("Welcome to our server");
       }
     );
   }
@@ -43,55 +43,37 @@ requestHandler = (req, res) => {
   const { pathname, searchParams } = new URL(req.url, baseURL);
   const endpoint = pathname.split("/");
   const path = endpoint[1] || "welcome";
-  const code = endpoint[2];
-  const index = parseInt(endpoint[2], 10);
-  console.log(" Path  = " + path + " index = " + index);
-  let entries = searchParams.entries();
-  const query = Object.fromEntries(entries);
+  const code = endpoint[2]; // Extract the code from the path
   const method = req.method.toUpperCase();
 
-  switch (method) {
-    case "POST":
-      if (path == "welcome") {
-        postHandler(welcome_file, query, (statuscode, response) => {
-          res.setHeader("content-type", 'text/plain; charset="utf-8"');
-          res.writeHeader(statuscode);
-          res.end(response);
-          res.statuscode = 200;
-        });
-      } else if (path == "menu") {
-        postHandler(menu_file, query, (statuscode, response) => {
-          res.setHeader("content-type", 'text/plain; charset="utf-8"');
-          res.writeHeader(statuscode);
-          res.end(response);
-          res.statuscode = 200;
-        });
-      } else {
-        res.statuscode = 404;
-        res.end(`In ${method} in an invalid path`);
-      }
-      break;
+  console.log("Path =", path, "Code =", code);
 
+  switch (method) {
     case "GET":
       if (path === "menu") {
-        // Handle the /menu GET request
-        getHandler(menu_file, index, res);
+        getHandler(menu_file, code, res);
       } else {
-        // Default to welcome message for all other GET requests
-        getHandler(welcome_file, index, res);
+        getHandler(welcome_file, code, res);
       }
       break;
 
-    case "DELETE":
-      if (path === "menu" && code) {
-        deleteHandler(menu_file, code, (statuscode, response) => {
-          res.setHeader("content-type", 'text/plain; charset="utf-8"');
-          res.writeHead(statuscode);
-          res.end(response);
-        });
+    case "POST":
+      if (path === "welcome") {
+        res.statusCode = 405; // Method Not Allowed
+        res.end("Method Not Allowed: POST is not supported on /welcome\n");
+      } else if (path === "menu") {
+        postHandler(
+          menu_file,
+          Object.fromEntries(searchParams),
+          (statuscode, response) => {
+            res.setHeader("content-type", 'text/plain; charset="utf-8"');
+            res.writeHead(statuscode);
+            res.end(response);
+          }
+        );
       } else {
         res.statusCode = 400;
-        res.end("Bad Request: Missing or invalid code");
+        res.end("BAD REQUEST");
       }
       break;
 
@@ -109,12 +91,28 @@ requestHandler = (req, res) => {
         );
       } else {
         res.statusCode = 400;
-        res.end("Bad Request: Missing or invalid code");
+        res.end("BAD REQUEST");
       }
       break;
+
+    case "DELETE":
+      if (path === "menu" && code) {
+        deleteHandler(menu_file, code, (statuscode, response) => {
+          res.setHeader("content-type", 'text/plain; charset="utf-8"');
+          res.writeHead(statuscode);
+          res.end(response);
+        });
+      } else {
+        res.statusCode = 400;
+        res.end("BAD REQUEST");
+      }
+      break;
+
     default:
-      res.statusCode = 405; // Method not allowed
-      res.end("Invalid method");
+      // Handle unsupported methods
+      res.statusCode = 400;
+      res.end("BAD REQUEST");
+      break;
   }
 };
 
@@ -154,7 +152,7 @@ const postHandler = (file, newItem, cb) => {
 
     if (isDuplicate) {
       console.log("Duplicate code detected.");
-      cb(400, "Bad Request: Duplicate code\n");
+      cb(400, "Bad Request: Duplicate Code\n");
       return;
     }
 
@@ -165,18 +163,48 @@ const postHandler = (file, newItem, cb) => {
   });
 };
 
-const getHandler = (file, index, res) => {
-  res.setHeader("content-type", "application/json");
-  res.statuscode = 200;
-  let rstream = fs.createReadStream(file);
-  rstream.pipe(res);
-  rstream.on("error", function (err) {
-    if (err.code === "ENOENT") {
-      res.statuscode = 404;
-      res.end("NOT FOUND");
+const getHandler = (file, code, res) => {
+  fs.readFile(file, "utf8", (err, data) => {
+    if (err) {
+      if (err.code === "ENOENT") {
+        res.statusCode = 404;
+        res.end("Not Found");
+      } else {
+        res.statusCode = 500;
+        res.end("Internal Server Error");
+      }
+      return;
+    }
+
+    // Check if the file is a JSON file
+    if (file.endsWith(".json")) {
+      try {
+        const menu = JSON.parse(data);
+
+        if (code) {
+          const item = menu.find((item) => item.code === code);
+          if (!item) {
+            res.statusCode = 404;
+            res.end("Not Found");
+            return;
+          }
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.end(JSON.stringify(item));
+        } else {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.end(JSON.stringify(menu));
+        }
+      } catch (parseError) {
+        res.statusCode = 500;
+        res.end("Internal Server Error: Unable to parse JSON");
+      }
     } else {
-      res.statuscode = 500;
-      res.end("Internal Server Error");
+      // Handle plain text files
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "text/plain");
+      res.end(data);
     }
   });
 };
