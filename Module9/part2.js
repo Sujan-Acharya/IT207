@@ -1,3 +1,9 @@
+/**
+ * Part 2 Task: Adding New Route for GET Method (25 points)
+ * - Adds functionality to fetch a specific menu item by its unique code.
+ * - Implements a new GET handler to retrieve a single item or handle errors if not found.
+ * - Updates the Request Handler to route requests to the new GET logic for `/menu/{code}`.
+ */
 const http = require("http");
 const fs = require("fs");
 
@@ -51,17 +57,18 @@ requestHandler = (req, res) => {
   switch (method) {
     case "GET":
       if (path === "menu") {
-        getHandler(menu_file, code, res);
+        if (code) {
+          getHandler(menu_file, code, res);
+        } else {
+          getHandler(menu_file, code, res);
+        }
       } else {
         getHandler(welcome_file, code, res);
       }
       break;
 
     case "POST":
-      if (path === "welcome") {
-        res.statusCode = 405; // Method Not Allowed
-        res.end("Method Not Allowed: POST is not supported on /welcome\n");
-      } else if (path === "menu") {
+      if (path === "menu") {
         postHandler(
           menu_file,
           Object.fromEntries(searchParams),
@@ -163,18 +170,41 @@ const postHandler = (file, newItem, cb) => {
   });
 };
 
-const getHandler = (file, index, res) => {
-  res.setHeader("content-type", "application/json");
-  res.statuscode = 200;
-  let rstream = fs.createReadStream(file);
-  rstream.pipe(res);
-  rstream.on("error", function (err) {
-    if (err.code === "ENOENT") {
-      res.statuscode = 404;
-      res.end("NOT FOUND");
+const getHandler = (file, code, res) => {
+  fs.readFile(file, "utf8", (err, data) => {
+    if (err) {
+      if (err.code === "ENOENT") {
+        res.statusCode = 404;
+        res.end("Not Found");
+      } else {
+        res.statusCode = 500;
+        res.end("Internal Server Error");
+      }
+      return;
+    }
+
+    if (file.endsWith(".json")) {
+      const menu = JSON.parse(data || "[]");
+
+      if (code) {
+        const item = menu.find((item) => item.code === code);
+        if (!item) {
+          res.statusCode = 404;
+          res.end("Not Found");
+          return;
+        }
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify(item));
+      } else {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify(menu));
+      }
     } else {
-      res.statuscode = 500;
-      res.end("Internal Server Error");
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "text/plain");
+      res.end(data);
     }
   });
 };
@@ -216,6 +246,6 @@ const deleteHandler = (file, code, cb) => {
 
 const server = http.createServer(requestHandler);
 
-server.listen(3032, () => {
-  console.log("Server listening on 3032");
+server.listen(3030, () => {
+  console.log("Server listening on 3030");
 });

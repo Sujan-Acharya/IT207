@@ -1,3 +1,9 @@
+/**
+ * Part 1 Task:
+ * Sets up a server for "Chilly Delights" to manage an ice cream menu
+ * and welcome message. Supports `GET`, `POST`, `PUT`, and `DELETE`
+ * requests, with proper error handling. Listens on port 3030.
+ */
 const http = require("http");
 const fs = require("fs");
 
@@ -58,10 +64,7 @@ requestHandler = (req, res) => {
       break;
 
     case "POST":
-      if (path === "welcome") {
-        res.statusCode = 405; // Method Not Allowed
-        res.end("Method Not Allowed: POST is not supported on /welcome\n");
-      } else if (path === "menu") {
+      if (path === "menu") {
         postHandler(
           menu_file,
           Object.fromEntries(searchParams),
@@ -216,6 +219,6 @@ const deleteHandler = (file, code, cb) => {
 
 const server = http.createServer(requestHandler);
 
-server.listen(3032, () => {
-  console.log("Server listening on 3032");
+server.listen(3030, () => {
+  console.log("Server listening on 3030");
 });
