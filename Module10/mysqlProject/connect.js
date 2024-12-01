@@ -78,7 +78,7 @@ switch (op.toUpperCase()) {
       console.log(results);
     });
     break;
-    
+
   case "DISPLAY":
     operations.display(mysqlConnect, table, (results) => {
       console.log("The results are\n");
