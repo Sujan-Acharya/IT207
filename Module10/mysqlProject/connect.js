@@ -5,7 +5,7 @@ const operations = require("./lib/operations");
 const mysqlConnect = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "$Sumit2015810",
+  password: "password",
 });
 
 mysqlConnect.connect((err) => {
