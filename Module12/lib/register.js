@@ -1,7 +1,7 @@
 const mysql = require("mysql2");
-exports.addRegistration = function (db, qs, cb) {
-  let sql = "Call SWIMDB.Addchild(?,?,?,@msg); Select @msg";
-  db.query(sql, [qs.childID, 1, qs.grpNum], (err, results) => {
+exports.addRegistration = function (conn, qs, cb) {
+  let sql = "Call SWIMDB.AddRegistration(?,?,@msg); Select @msg";
+  conn.query(sql, [qs.childID, qs.grpNum], (err, results) => {
     if (err) {
       let message = "Internal server error";
       cb(500, message, message);
