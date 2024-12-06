@@ -66,7 +66,7 @@ Create procedure If not exists AddRegistration(IN cID INT, IN grpID INT, OUT msg
         END IF;
 
         if (error = false) THEN
-            INSERT INTO register (ChildID, GrpNUM) values ( cID, grpID);
+            INSERT INTO register (ChildID, grpID) values ( cID, grpID);
             UPDATE grp set enrollment = enroll_count + 1 where grpNUM = grpID;
             SET STATUS = "Registration Successful";
         END IF;

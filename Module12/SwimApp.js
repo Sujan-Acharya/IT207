@@ -68,9 +68,10 @@ requestHandler = (req, res) => {
           res.end(resMsg);
         });
       } else if (pathname == "/register" || pathname == "/register/") {
-        register.addRegistration(
+        register.addRegister(
           mysqlConnect,
-          query,
+          query.childID,
+          query.grpNum,
           (statusCode, resStr, resMsg) => {
             res.writeHead(statusCode, resStr, { "content-type": "text/plain" });
             res.end(resMsg);
