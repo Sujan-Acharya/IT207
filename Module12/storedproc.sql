@@ -56,7 +56,7 @@ Create procedure If not exists AddRegistration(IN cID INT, IN grpID INT, OUT msg
         END IF;
 
         if ( upper(grp_Level) = 'BEGINER' and (enroll_count = 10) ) THEN
-            set STATUS = CONCAT (status, " Maximum enrollment allowed in a Beginer level is 10; ");
+            set STATUS = CONCAT (status, " Maximum enrollment allowed in a Beginner level is 10; ");
             set error = true;
         END IF;
 
@@ -75,3 +75,15 @@ Create procedure If not exists AddRegistration(IN cID INT, IN grpID INT, OUT msg
 //
 
 delimiter ;
+
+DELIMITER //
+
+CREATE PROCEDURE IF NOT EXISTS GetGroupCount(IN level_name VARCHAR(50), OUT count INT)
+BEGIN
+    SELECT COUNT(*) INTO count
+    FROM grp
+    WHERE UPPER(grpLevel) = UPPER(level_name);
+END //
+
+DELIMITER ;
+

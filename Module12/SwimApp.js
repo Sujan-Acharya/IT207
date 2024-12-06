@@ -83,11 +83,18 @@ requestHandler = (req, res) => {
       break;
 
     case "GET":
-      res.end(`In ${method} in the ${pathname} path`);
+      if (pathname === "/group/count" || pathname === "/group/count/") {
+        grp.getGroupCount(mysqlConnect, query, (statusCode, resStr, resMsg) => {
+          res.writeHead(statusCode, resStr, { "content-type": "text/plain" });
+          res.end(resMsg);
+        });
+      } else {
+        res.end(`In ${method} in the ${pathname} path`);
+      }
       break;
-
     default:
       res.end("Invalid method");
+      break;
   }
 };
 
