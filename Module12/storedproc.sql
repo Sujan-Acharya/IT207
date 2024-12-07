@@ -87,3 +87,24 @@ END //
 
 DELIMITER ;
 
+DELIMITER //
+
+CREATE PROCEDURE IF NOT EXISTS ChildList(IN grpNum INT)
+BEGIN
+    DECLARE numrows INT;
+    SELECT COUNT(*) INTO numrows 
+    FROM grp
+    WHERE grpNum = grpNum;
+
+    IF numrows = 0 THEN
+        SELECT "Group does not exist" AS message;
+    ELSE
+        SELECT c.childName, c.birthDate
+        FROM Child c
+        INNER JOIN Register r ON c.ChildID = r.ChildID
+        WHERE r.grpNum = grpNum;
+    END IF;
+END //
+
+DELIMITER ;
+

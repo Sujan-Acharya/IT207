@@ -21,7 +21,6 @@ mysqlConnect.connect((err) => {
   }
 });
 
-//Create Database if not exists.
 
 let create_db_sql = "CREATE DATABASE if not exists SwimDB;";
 
@@ -85,7 +84,12 @@ requestHandler = (req, res) => {
     case "GET":
       if (pathname === "/group/count" || pathname === "/group/count/") {
         grp.getGroupCount(mysqlConnect, query, (statusCode, resStr, resMsg) => {
-          res.writeHead(statusCode, resStr, { "content-type": "text/plain" });
+          res.writeHead(statusCode, resStr, { "Content-Type": "text/plain" });
+          res.end(resMsg);
+        });
+      } else if (pathname === "/child/list" || pathname === "/child/list/") {
+        child.childList(mysqlConnect, query, (statusCode, resStr, resMsg) => {
+          res.writeHead(statusCode, resStr, { "Content-Type": "text/plain" });
           res.end(resMsg);
         });
       } else {
