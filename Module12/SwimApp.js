@@ -21,7 +21,6 @@ mysqlConnect.connect((err) => {
   }
 });
 
-
 let create_db_sql = "CREATE DATABASE if not exists SwimDB;";
 
 mysqlConnect.query(create_db_sql, (err) => {
