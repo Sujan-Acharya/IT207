@@ -19,7 +19,7 @@ DELIMITER ;
 
 
 DELIMITER $$
-CREATE PROCEDURE SAILDB.GetSailor(OUT msg VARCHAR(255))
+CREATE PROCEDURE GetSailor(OUT msg VARCHAR(255))
 BEGIN
   IF (SELECT COUNT(*) FROM sailor) = 0 THEN
     SET msg = "Sailor Table is empty";
@@ -30,29 +30,6 @@ BEGIN
 END$$
 DELIMITER ;
 
-DELIMITER //
-
-CREATE PROCEDURE SAILDB.UpdateSailor(
-    IN p_S_Id INT,
-    IN p_S_name VARCHAR(255),
-    IN p_Rate INT,
-    IN p_B_date DATE
-)
-BEGIN
-    UPDATE Sailor 
-    SET S_name = p_S_name, 
-        Rate = p_Rate, 
-        B_date = p_B_date
-    WHERE S_Id = p_S_Id;
-
-    IF ROW_COUNT() = 0 THEN
-        SELECT 'No sailor found with this ID' AS message;
-    ELSE
-        SELECT 'Sailor updated successfully' AS message;
-    END IF;
-END //
-
-DELIMITER ;
 
 DELIMITER //
 
@@ -294,19 +271,4 @@ END$$
 
 DELIMITER ;
 
-DELIMITER $$
-
-CREATE PROCEDURE AddReserves(
-    IN p_sailor_id INT,
-    IN p_boat_id INT,
-    IN p_day DATE,
-    OUT msg VARCHAR(255)
-)
-BEGIN
-    INSERT INTO Reserves(S_Id, B_Id, Day)
-    VALUES(p_sailor_id, p_boat_id, p_day);
-    SET msg = 'Reserve added successfully';
-END$$
-
-DELIMITER ;
 
