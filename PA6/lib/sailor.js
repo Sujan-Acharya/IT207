@@ -23,7 +23,6 @@ exports.getSailor = function (db, cb) {
       if (results.length === 0) {
         cb(404, "Not Found", "Sailor table is empty");
       } else {
-        // Convert results to a readable string format
         const sailorData = results
           .map((sailor) => `${sailor.S_Id} ${sailor.S_name} ${sailor.Rate}`)
           .join("\n");
@@ -35,7 +34,6 @@ exports.getSailor = function (db, cb) {
 };
 
 exports.updateSailor = function (db, updateData, cb) {
-  // Build the SET clause dynamically based on provided update data
   const updates = [];
   const values = [];
 
@@ -52,12 +50,10 @@ exports.updateSailor = function (db, updateData, cb) {
     values.push(updateData.bdate);
   }
 
-  // If no updates provided
   if (updates.length === 0 || !updateData.id) {
     return cb(400, "Bad Request", "Missing required data");
   }
 
-  // Add sailorId to values array
   values.push(updateData.id);
 
   const sql = `UPDATE Sailor SET ${updates.join(", ")} WHERE S_Id = ?`;

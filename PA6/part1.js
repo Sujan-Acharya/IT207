@@ -1,10 +1,10 @@
 const mysql = require("mysql2");
 const fs = require("fs");
 const http = require("http");
-const url = require("url"); // Add this at the top with your other imports
+const url = require("url");
 const sailor = require("./lib/sailor");
 const boat = require("./lib/boat");
-const reserve = require("./lib/reserve");
+const reserves = require("./lib/reserves");
 
 const mysqlConnect = mysql.createConnection({
   host: "localhost",
@@ -32,7 +32,7 @@ mysqlConnect.query(create_db_sql, (err) => {
 let create_saildb_tbls =
   " CREATE table if not exists Sailor (S_Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, S_name VARCHAR(25) NOT NULL, \
  B_date DATE NOT NULL, Rate INT NOT NULL); CREATE table if not exists Boat (B_Id INT  NOT NULL AUTO_INCREMENT PRIMARY KEY, B_name VARCHAR(50) NOT NULL, \
- B_type VARCHAR(50) NOT NULL); CREATE TABLE if not exists Reserve (S_Id INT NOT NULL, B_Id INT NOT NULL, Day DATE NOT NULL, \
+ B_type VARCHAR(50) NOT NULL); CREATE TABLE if not exists reserves (S_Id INT NOT NULL, B_Id INT NOT NULL, Day DATE NOT NULL, \
  CONSTRAINT FOREIGN KEY (S_Id) references Sailor(S_Id), CONSTRAINT FOREIGN KEY (B_Id) REFERENCES Boat(B_Id), \
  PRIMARY KEY (S_Id, B_Id))";
 
@@ -56,18 +56,24 @@ requestHandler = (req, res) => {
   switch (method) {
     case "POST":
       if (pathname === "/sailor" || pathname === "/sailor/") {
-        // res.end(`In ${method} in the ${pathname} path`);
         sailor.addSailor(mysqlConnect, query, (statusCode, resStr, resMsg) => {
           res.writeHead(statusCode, resStr, { "content-type": "text/plain" });
           res.end(resMsg);
         });
       } else if (pathname == "/boat" || pathname == "/boat/") {
-        // res.end(`In ${method} in the ${pathname} path`);
         boat.addBoat(mysqlConnect, query, (statusCode, resStr, resMsg) => {
           res.writeHead(statusCode, resStr, { "content-type": "text/plain" });
           res.end(resMsg);
         });
-      } else if (pathname == "/reserve" || pathname == "/reserve/") {
+      } else if (pathname == "/reserves" || pathname == "/reserves/") {
+        reserves.addReserves(
+          mysqlConnect,
+          query,
+          (statusCode, resStr, resMsg) => {
+            res.writeHead(statusCode, resStr, { "content-type": "text/plain" });
+            res.end(resMsg);
+          }
+        );
       } else {
         res.end("Invalid path specified");
       }
@@ -87,11 +93,18 @@ requestHandler = (req, res) => {
           res.writeHead(statusCode, resStr, { "Content-Type": "text/plain" });
           res.end(responseMessage);
         });
+      } else if (pathname === "/reserves" || pathname === "/reserves/") {
+        reserves.getReserves(
+          mysqlConnect,
+          (statusCode, resStr, responseMessage) => {
+            res.writeHead(statusCode, resStr, { "Content-Type": "text/plain" });
+            res.end(responseMessage);
+          }
+        );
       }
       break;
     case "PUT":
       if (pathname === "/sailor" || pathname === "/sailor/") {
-        // Handle format: localhost:3030/sailor/?S_Id=2&Rate=5&B_date=1993-12-19
         const query = url.parse(req.url, true).query;
         const updateData = {
           id: query.S_Id,
@@ -109,7 +122,6 @@ requestHandler = (req, res) => {
           }
         );
       } else if (pathname.startsWith("/sailor/")) {
-        // Handle format: localhost:3030/sailor/2?Rate=5&B_date=1993-12-19
         const sailorId = pathname.split("/")[2];
         const query = url.parse(req.url, true).query;
         const updateData = {
@@ -128,7 +140,6 @@ requestHandler = (req, res) => {
           }
         );
       } else if (pathname === "/boat" || pathname === "/boat/") {
-        // Handle format: localhost:3030/boat/?B_Id=2&B_type=Sailboat&B_name=Serenity
         const query = url.parse(req.url, true).query;
         const updateData = {
           id: query.B_Id,
@@ -145,7 +156,6 @@ requestHandler = (req, res) => {
           }
         );
       } else if (pathname.startsWith("/boat/")) {
-        // Handle format: localhost:3030/boat/2?B_type=Sailboat&B_name=Serenity
         const boatId = pathname.split("/")[2];
         const query = url.parse(req.url, true).query;
         const updateData = {
@@ -179,6 +189,20 @@ requestHandler = (req, res) => {
         const boatId = pathname.split("/")[2];
         boat.deleteBoat(
           mysqlConnect,
+          boatId,
+          (statusCode, resStr, responseMessage) => {
+            res.writeHead(statusCode, resStr, { "Content-Type": "text/plain" });
+            res.end(responseMessage);
+          }
+        );
+      } else if (pathname.startsWith("/reserves/")) {
+        const pathParts = pathname.split("/");
+        const sailorId = pathParts[2];
+        const boatId = pathParts[3];
+
+        reserves.deleteReserves(
+          mysqlConnect,
+          sailorId,
           boatId,
           (statusCode, resStr, responseMessage) => {
             res.writeHead(statusCode, resStr, { "Content-Type": "text/plain" });

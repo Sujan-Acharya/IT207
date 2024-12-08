@@ -23,7 +23,6 @@ exports.getBoat = function (db, cb) {
       if (results.length === 0) {
         cb(404, "Not Found", "Boat table is empty");
       } else {
-        // Convert results to a readable string format
         const boatData = results
           .map((boat) => `${boat.B_Id} ${boat.B_name} ${boat.B_type}`)
           .join("\n");
@@ -35,7 +34,6 @@ exports.getBoat = function (db, cb) {
 };
 
 exports.updateBoat = function (db, updateData, cb) {
-  // Build the SET clause dynamically based on provided update data
   const updates = [];
   const values = [];
 
@@ -48,12 +46,10 @@ exports.updateBoat = function (db, updateData, cb) {
     values.push(updateData.type);
   }
 
-  // If no updates provided
   if (updates.length === 0 || !updateData.id) {
     return cb(400, "Bad Request", "Missing required data");
   }
 
-  // Add boatId to values array
   values.push(updateData.id);
 
   const sql = `UPDATE Boat SET ${updates.join(", ")} WHERE B_Id = ?`;

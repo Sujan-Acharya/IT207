@@ -1,0 +1,63 @@
+exports.getReserves = function (db, cb) {
+  let sql = `
+      SELECT r.S_Id, s.S_name AS Sailor_Name, r.B_Id, b.B_name AS Boat_Name, DATE_FORMAT(r.Day, '%a %b %d %Y') as Day 
+      FROM Reserves r
+      JOIN Sailor s ON r.S_Id = s.S_Id
+      JOIN Boat b ON r.B_Id = b.B_Id`;
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error(err);
+      cb(500, "Internal server error", "Database query failed");
+    } else {
+      if (results.length === 0) {
+        cb(404, "Not Found", "Reserve table is empty");
+      } else {
+        const reserveData = results
+          .map(
+            (reserve) =>
+              `${reserve.S_Id} ${reserve.Sailor_Name} ${reserve.B_Id} ${reserve.Boat_Name} ${reserve.Day}`
+          )
+          .join("\n");
+
+        cb(200, "OK", reserveData);
+      }
+    }
+  });
+};
+exports.addReserves = function (db, qs, cb) {
+  let sql = "Call SAILDB.AddReserves(?,?,?,@msg); Select @msg";
+  db.query(sql, [qs.S_Id, qs.B_Id, qs.Day], (err, results) => {
+    if (err) {
+      cb(500, "Error", err.sqlMessage);
+    } else {
+      console.log(results[1][0]["@msg"]); //for debugging - to be printed on the Server terminal
+      cb(200, "OK", results[1][0]["@msg"]);
+    }
+  });
+};
+
+exports.deleteReserves = function (db, sailorId, boatId, cb) {
+  const sql = "DELETE FROM Reserve WHERE S_Id = ? AND B_Id = ?";
+
+  db.query(sql, [sailorId, boatId], (err, result) => {
+    if (err) {
+      console.error(err);
+      cb(500, "Internal Server Error", "Database delete failed");
+    } else {
+      if (result.affectedRows === 0) {
+        cb(
+          404,
+          "Not Found",
+          `Reservation with Sailor ID ${sailorId} and Boat ID ${boatId} not found`
+        );
+      } else {
+        cb(
+          200,
+          "OK",
+          `Reservation for Sailor ${sailorId} and Boat ${boatId} deleted successfully`
+        );
+      }
+    }
+  });
+};

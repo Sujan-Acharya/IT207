@@ -6,13 +6,10 @@ CREATE PROCEDURE AddSailor(IN name VARCHAR(25), IN dob DATE, IN rate INT, OUT ms
 BEGIN
     DECLARE status VARCHAR(50) DEFAULT " ";
 
-    -- Try to insert the new sailor
     INSERT INTO Sailor (S_name, B_date, Rate) VALUES (name, dob, rate);
 
-    -- Set the status message
     SET status = "Sailor is added";
 
-    -- Assign the status to the output variable
     SET msg = status;
 END;
 //
@@ -24,11 +21,9 @@ DELIMITER ;
 DELIMITER $$
 CREATE PROCEDURE SAILDB.GetSailor(OUT msg VARCHAR(255))
 BEGIN
-  -- Check if the sailor table is empty
   IF (SELECT COUNT(*) FROM sailor) = 0 THEN
     SET msg = "Sailor Table is empty";
   ELSE
-    -- Retrieve all sailors
     SELECT * FROM sailor;
     SET msg = "All sailors retrieved successfully.";
   END IF;
@@ -72,7 +67,6 @@ BEGIN
     DECLARE sailor_exists INT;
     DECLARE status VARCHAR(100) DEFAULT '';
     
-    -- Check if sailor exists
     SELECT COUNT(*) INTO sailor_exists 
     FROM Sailor 
     WHERE S_id = sailor_id;
@@ -80,8 +74,6 @@ BEGIN
     IF sailor_exists = 0 THEN
         SET status = CONCAT('No sailor found with ID: ', sailor_id);
     ELSE
-        -- Update the sailor's information
-        -- Only update fields that are not NULL
         UPDATE Sailor 
         SET 
             S_name = CASE 
@@ -101,7 +93,6 @@ BEGIN
         SET status = CONCAT('Sailor with ID: ', sailor_id, ' updated successfully');
     END IF;
     
-    -- Set the output message
     SET msg = status;
 END //
 
@@ -117,7 +108,6 @@ BEGIN
     DECLARE sailor_exists INT;
     DECLARE status VARCHAR(100) DEFAULT '';
     
-    -- Check if sailor exists
     SELECT COUNT(*) INTO sailor_exists 
     FROM Sailor 
     WHERE S_id = sailor_id;
@@ -125,14 +115,12 @@ BEGIN
     IF sailor_exists = 0 THEN
         SET status = CONCAT('No sailor found with ID: ', sailor_id);
     ELSE
-        -- Delete the sailor
         DELETE FROM Sailor 
         WHERE S_id = sailor_id;
         
         SET status = CONCAT('Sailor with ID: ', sailor_id, ' deleted successfully');
     END IF;
     
-    -- Set the output message
     SET msg = status;
 END //
 
@@ -155,13 +143,10 @@ CREATE PROCEDURE AddBoat(
 BEGIN
     DECLARE status VARCHAR(50) DEFAULT '';
 
-    -- Try to insert the new boat
     INSERT INTO Boat (B_name, B_type) VALUES (name, type);
 
-    -- Set the status message
     SET status = 'Boat is added';
 
-    -- Assign the status to the output variable
     SET msg = status;
 END;
 //
@@ -172,11 +157,9 @@ DELIMITER $$
 
 CREATE PROCEDURE GetBoat(OUT msg VARCHAR(255))
 BEGIN
-    -- Check if the boat table is empty
     IF (SELECT COUNT(*) FROM boat) = 0 THEN
         SET msg = 'Boat Table is empty';
     ELSE
-        -- Retrieve all boats
         SELECT * FROM boat;
         SET msg = 'All boats retrieved successfully.';
     END IF;
@@ -196,7 +179,6 @@ BEGIN
     DECLARE boat_exists INT;
     DECLARE status VARCHAR(100) DEFAULT '';
     
-    -- Check if boat exists
     SELECT COUNT(*) INTO boat_exists 
     FROM Boat 
     WHERE B_Id = p_B_Id;
@@ -204,8 +186,6 @@ BEGIN
     IF boat_exists = 0 THEN
         SET status = CONCAT('No boat found with ID: ', p_B_Id);
     ELSE
-        -- Update the boat's information
-        -- Only update fields that are not NULL
         UPDATE Boat 
         SET 
             B_name = CASE 
@@ -220,9 +200,7 @@ BEGIN
         
         SET status = CONCAT('Boat with ID: ', p_B_Id, ' updated successfully');
     END IF;
-    
-    -- Set the output message
-    SET msg = status;
+        SET msg = status;
 END //
 
 DELIMITER ;
@@ -236,24 +214,19 @@ CREATE PROCEDURE DeleteBoat(
 BEGIN
     DECLARE boat_exists INT;
     DECLARE status VARCHAR(100) DEFAULT '';
-    
-    -- Check if boat exists
-    SELECT COUNT(*) INTO boat_exists 
+        SELECT COUNT(*) INTO boat_exists 
     FROM Boat 
     WHERE B_Id = boat_id;
     
     IF boat_exists = 0 THEN
         SET status = CONCAT('No boat found with ID: ', boat_id);
     ELSE
-        -- Delete the boat
         DELETE FROM Boat 
         WHERE B_Id = boat_id;
         
         SET status = CONCAT('Boat with ID: ', boat_id, ' deleted successfully');
     END IF;
-    
-    -- Set the output message
-    SET msg = status;
+        SET msg = status;
 END //
 
 DELIMITER ;
@@ -262,4 +235,78 @@ DELIMITER ;
                                                                      -- Stores Procedure for reserve.js --
 
 
+DELIMITER $$
+
+CREATE PROCEDURE AddReserves(
+    IN p_sailor_id INT,
+    IN p_boat_id INT,
+    IN p_day DATE,
+    OUT msg VARCHAR(255)
+)
+BEGIN
+    INSERT INTO Reserves(S_Id, B_Id, Day)
+    VALUES(p_sailor_id, p_boat_id, p_day);
+    SET msg = 'Reserve added successfully';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE DeleteReserves(
+    IN p_sailor_id INT,
+    IN p_boat_id INT,
+    OUT msg VARCHAR(255)
+)
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Reserves WHERE S_Id = p_sailor_id AND B_Id = p_boat_id) THEN
+        SET msg = 'Error: Reservation not found';
+    ELSE
+        DELETE FROM Reserves 
+        WHERE S_Id = p_sailor_id 
+        AND B_Id = p_boat_id;
+        SET msg = 'Reserve deleted successfully';
+    END IF;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE GetReserves(OUT msg VARCHAR(255))
+BEGIN
+    IF (SELECT COUNT(*) FROM Reserves) = 0 THEN
+        SET msg = 'Reserves Table is empty';
+    ELSE
+        SELECT 
+            r.S_Id,
+            s.Name AS Sailor_Name,
+            r.B_Id,
+            b.Name AS Boat_Name,
+            r.Day
+        FROM Reserves r
+        JOIN Sailor s ON r.S_Id = s.S_Id
+        JOIN Boat b ON r.B_Id = b.B_Id;
+        SET msg = 'Reserves retrieved successfully.';
+    END IF;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE AddReserves(
+    IN p_sailor_id INT,
+    IN p_boat_id INT,
+    IN p_day DATE,
+    OUT msg VARCHAR(255)
+)
+BEGIN
+    INSERT INTO Reserves(S_Id, B_Id, Day)
+    VALUES(p_sailor_id, p_boat_id, p_day);
+    SET msg = 'Reserve added successfully';
+END$$
+
+DELIMITER ;
 
