@@ -1,14 +1,17 @@
 const mysql = require("mysql2");
 
 exports.addSailor = function (db, qs, cb) {
-  let sql = "Call SAILDB.AddSailor(?,?,?,@msg); Select @msg";
+  let sql = "CALL AddSailor(?, ?, ?, @msg); SELECT @msg";
   db.query(sql, [qs.S_name, qs.B_date, qs.Rate], (err, results) => {
     if (err) {
-      let message = "Internal server error";
-      cb(500, message, message);
+      cb(500, "Error", err.sqlMessage);
     } else {
-      console.log(results[1][0]["@msg"]); //for debugging - to be printed on the Server terminal
-      cb(200, "OK", results[1][0]["@msg"]);
+      const msg = results[1][0]["@msg"];
+      if (msg === "Sailor added") {
+        cb(200, "OK", msg);
+      } else {
+        cb(400, "Bad Request", msg);
+      }
     }
   });
 };
