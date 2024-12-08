@@ -37,12 +37,16 @@ exports.addReserves = function (db, qs, cb) {
   });
 };
 
-exports.deleteReserves = function (db, sailorId, boatId, cb) {
-  const sql = "DELETE FROM Reserve WHERE S_Id = ? AND B_Id = ?";
+exports.deleteReserves = function (db, sailorId, boatId, day, cb) {
+  // Added day parameter
+  // Log the received parameters for debugging
+  console.log("Received parameters:", { sailorId, boatId, day });
 
-  db.query(sql, [sailorId, boatId], (err, result) => {
+  const sql = "DELETE FROM Reserves WHERE S_Id = ? AND B_Id = ? AND Day = ?";
+
+  db.query(sql, [sailorId, boatId, day], (err, result) => {
     if (err) {
-      console.error(err);
+      console.error("Database error:", err);
       cb(500, "Internal Server Error", "Database delete failed");
     } else {
       if (result.affectedRows === 0) {
@@ -52,11 +56,7 @@ exports.deleteReserves = function (db, sailorId, boatId, cb) {
           `Reservation with Sailor ID ${sailorId} and Boat ID ${boatId} not found`
         );
       } else {
-        cb(
-          200,
-          "OK",
-          `Reservation for Sailor ${sailorId} and Boat ${boatId} deleted successfully`
-        );
+        cb(200, "OK", "Reservation has been deleted");
       }
     }
   });

@@ -233,15 +233,20 @@ DELIMITER $$
 CREATE PROCEDURE DeleteReserves(
     IN p_sailor_id INT,
     IN p_boat_id INT,
+    IN p_day DATE,    -- Added parameter for Day
     OUT msg VARCHAR(255)
 )
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM Reserves WHERE S_Id = p_sailor_id AND B_Id = p_boat_id) THEN
+    IF NOT EXISTS (SELECT 1 FROM Reserves 
+                  WHERE S_Id = p_sailor_id 
+                  AND B_Id = p_boat_id 
+                  AND Day = p_day) THEN
         SET msg = 'Error: Reservation not found';
     ELSE
         DELETE FROM Reserves 
         WHERE S_Id = p_sailor_id 
-        AND B_Id = p_boat_id;
+        AND B_Id = p_boat_id
+        AND Day = p_day;
         SET msg = 'Reserve deleted successfully';
     END IF;
 END$$

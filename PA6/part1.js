@@ -195,15 +195,26 @@ requestHandler = (req, res) => {
             res.end(responseMessage);
           }
         );
-      } else if (pathname.startsWith("/reserves/")) {
-        const pathParts = pathname.split("/");
-        const sailorId = pathParts[2];
-        const boatId = pathParts[3];
+      } else if (pathname === "/reserves" && req.method === "DELETE") {
+        const url = new URL(req.url, `http://${req.headers.host}`);
+        const sailorId = url.searchParams.get("S_Id");
+        const boatId = url.searchParams.get("B_Id");
+        const day = url.searchParams.get("Day");
+
+        // Add validation
+        if (!sailorId || !boatId || !day) {
+          res.writeHead(400, "Bad Request", { "Content-Type": "text/plain" });
+          res.end(
+            "Missing required parameters: S_Id, B_Id, and Day are required"
+          );
+          return;
+        }
 
         reserves.deleteReserves(
           mysqlConnect,
           sailorId,
           boatId,
+          day,
           (statusCode, resStr, responseMessage) => {
             res.writeHead(statusCode, resStr, { "Content-Type": "text/plain" });
             res.end(responseMessage);
