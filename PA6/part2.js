@@ -2,9 +2,9 @@ const mysql = require("mysql2");
 const fs = require("fs");
 const http = require("http");
 const url = require("url");
-const sailor = require("./lib/sailor2");
-const boat = require("./lib/boat2");
-const reserves = require("./lib/reserves2");
+const sailor = require("./lib/sailor");
+const boat = require("./lib/boat");
+const reserves = require("./lib/reserves");
 
 const mysqlConnect = mysql.createConnection({
   host: "localhost",
@@ -56,7 +56,7 @@ requestHandler = (req, res) => {
   switch (method) {
     case "POST":
       if (pathname === "/sailor" || pathname === "/sailor/") {
-        sailor.addSailor(mysqlConnect, query, (statusCode, resStr, resMsg) => {
+        sailor.InsertSailor (mysqlConnect, query, (statusCode, resStr, resMsg) => {
           res.writeHead(statusCode, resStr, { "content-type": "text/plain" });
           res.end(resMsg);
         });

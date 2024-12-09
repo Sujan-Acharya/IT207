@@ -1,3 +1,12 @@
+/*
+Part 1: Database and Server Implementation
+This code implements a Node.js server that:
+1. Creates and manages a MySQL database (SailDB) with tables for Sailors, Boats and Reservations
+2. Sets up REST API endpoints to handle CRUD operations
+3. Implements database operations through modular implementation files
+4. Includes error handling and input validation
+Port: 3030
+*/
 const mysql = require("mysql2");
 const fs = require("fs");
 const http = require("http");
