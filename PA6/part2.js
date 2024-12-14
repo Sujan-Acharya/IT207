@@ -56,7 +56,7 @@ requestHandler = (req, res) => {
   switch (method) {
     case "POST":
       if (pathname === "/sailor" || pathname === "/sailor/") {
-        sailor.InsertSailor (mysqlConnect, query, (statusCode, resStr, resMsg) => {
+        sailor.insertSailor(mysqlConnect, query, (statusCode, resStr, resMsg) => {
           res.writeHead(statusCode, resStr, { "content-type": "text/plain" });
           res.end(resMsg);
         });
@@ -66,7 +66,7 @@ requestHandler = (req, res) => {
           res.end(resMsg);
         });
       } else if (pathname == "/reserves" || pathname == "/reserves/") {
-        reserves.addReserves(
+        reserves.insertReserves(
           mysqlConnect,
           query,
           (statusCode, resStr, resMsg) => {

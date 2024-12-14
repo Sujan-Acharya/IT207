@@ -25,8 +25,8 @@ exports.getReserves = function (db, cb) {
     }
   });
 };
-exports.addReserves = function (db, qs, cb) {
-  let sql = "Call SAILDB.AddReserves(?,?,?,@msg); Select @msg";
+exports.insertReserves = function (db, qs, cb) {
+  let sql = "Call SAILDB.InsertReserves(?,?,?,@msg); Select @msg";
   db.query(sql, [qs.S_Id, qs.B_Id, qs.Day], (err, results) => {
     if (err) {
       cb(500, "Error", err.sqlMessage);

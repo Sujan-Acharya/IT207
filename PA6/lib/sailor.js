@@ -1,7 +1,7 @@
 const mysql = require("mysql2");
 
-exports.addSailor = function (db, qs, cb) {
-  let sql = "Call SAILDB.AddSailor(?,?,?,@msg); Select @msg";
+exports.insertSailor = function (db, qs, cb) {
+  let sql = "Call SAILDB.InsertSailor(?,?,?,@msg); Select @msg";
   db.query(sql, [qs.S_name, qs.B_date, qs.Rate], (err, results) => {
     if (err) {
       let message = "Internal server error";
